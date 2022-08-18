@@ -9,15 +9,10 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import react from 'react';
 
 const App = () => {
   const [user, setUser] = useState("");
   const [result, setResult] = useState([]);
-
-  const exit = () => {
-    AsyncStorage.removeItem('user');
-  }
 
   const save = () => {
     if (user) {
@@ -29,17 +24,7 @@ const App = () => {
       (value) =>
         setResult(value)
     );
-
-     React.createElement(
-      "button",
-      {
-        className: "panel-btn-open"
-      },
-      "Open"
-    )
   }
-
-
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
