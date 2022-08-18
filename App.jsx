@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -11,19 +10,36 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const App = () => {
-  const [user, setUser] = useState("");
-  const [result, setResult] = useState([]);
+  const [resultado, setResultado] = useState()
+  const [userName, setUsername] = useState()
 
-  const save = () => {
-    if (user) {
-      AsyncStorage.setItem('user', user);
-    } else {
-      user('Usuário não informado');
+  async function saveItem() {
+    try {
+      await AsyncStorage.setItem('@app:user', userName)
+      setResultado(`Seja bem vindo, ${userName}`)
+    } catch (err) {
+      console.log(err)
     }
-    AsyncStorage.getItem('user').then(
-      (value) =>
-        setResult(value)
-    );
+  }
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const user = await AsyncStorage.getItem('@app:user')
+        if (user) {
+          setResultado(`Seja bem vindo, ${user}`)
+        } else {
+          setResultado("Nenhuma informação encontrada")
+        }
+      } catch (err) {
+        console.log(err)
+      }
+    } fetchData()
+  }, [])
+
+  async function clear() {
+    await AsyncStorage.clear()
+    setResultado("Nenhuma informação encontrada")
   }
 
   return (
@@ -35,22 +51,29 @@ const App = () => {
         <View style={styles.flex}>
           <TextInput
             placeholder="Digite seu username"
-            value={user}
-            onChangeText={(data) => setUser(data)}
-            underlineColorAndroid="transparent"
+            value={userName}
+            onChangeText={(texto) => setUsername(texto)}
             style={styles.textInputStyle}
           />
           <TouchableOpacity
-            onPress={save}
+            onPress={saveItem}
             style={styles.buttonStyle}>
-            <Text style={styles.buttonTextStyle}> Salvar </Text>
+            <Text style={styles.buttonTextStyle}>
+              Salvar
+            </Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.flex2}>
-          <Text>
-            {result}
+        <Text>
+          {resultado}
+        </Text>
+        <TouchableOpacity
+          style={styles.buttonLimpar}
+          onPress={clear}>
+          <Text
+            style={styles.buttonTextStyle}>
+            Limpar
           </Text>
-        </View>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -78,6 +101,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'purple',
     padding: 5,
     borderRadius: 10
+  },
+  buttonLimpar: {
+    fontSize: 16,
+    color: 'white',
+    backgroundColor: 'purple',
+    padding: 5,
+    borderRadius: 10,
+    width: 100,
+    justifyContent: 'center'
   },
   buttonTextStyle: {
     padding: 5,
